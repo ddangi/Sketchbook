@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sketchbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #faf6f0;
+    --warm-white: #fffdf9;
+    --ink: #1a1612;
+    --ink-soft: #4a4540;
+    --ink-muted: #9a9590;
+    --accent: #c8845a;
+    --accent-light: #f0d5c0;
+    --border: #e8e0d5;
+    --shadow: rgba(26,22,18,0.08);
+    --shadow-deep: rgba(26,22,18,0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+    padding: 0 24px;
+  }
+  .header-inner {
+    max-width: 1100px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 600;
+    color: var(--ink); letter-spacing: -0.02em;
+  }
+  .logo span { color: var(--accent); font-style: italic; }
+  .header-actions { display: flex; gap: 12px; align-items: center; }
+  .btn {
+    padding: 8px 18px; border-radius: 6px; font-size: 0.82rem;
+    font-family: 'Noto Sans KR', sans-serif; font-weight: 400;
+    cursor: pointer; transition: all 0.2s; border: none;
+  }
+  .btn-outline {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--ink-soft);
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-primary {
+    background: var(--accent); color: white;
+  }
+  .btn-primary:hover { background: #b5724a; }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center; padding: 64px 24px 48px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 400;
+    color: var(--ink); line-height: 1.2; margin-bottom: 12px;
+  }
+  .hero h1 em { color: var(--accent); font-style: italic; }
+  .hero p {
+    color: var(--ink-muted); font-size: 0.9rem; letter-spacing: 0.03em;
+  }
+
+  /* ── GALLERY GRID ── */
+  .gallery-wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px 80px; }
+
+  .gallery-grid {
+    columns: 3;
+    column-gap: 16px;
+  }
+  @media (max-width: 768px) { .gallery-grid { columns: 2; } }
+  @media (max-width: 480px) { .gallery-grid { columns: 1; } }
+
+  .card {
+    break-inside: avoid;
+    margin-bottom: 16px;
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.25s, box-shadow 0.25s;
+    position: relative;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px var(--shadow-deep);
+  }
+  .card img {
+    width: 100%; display: block;
+    object-fit: cover;
+    background: var(--border);
+  }
+  .card-meta {
+    padding: 12px 14px 14px;
+  }
+  .card-date {
+    font-size: 0.72rem; color: var(--ink-muted);
+    letter-spacing: 0.05em; text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .card-note {
+    font-size: 0.85rem; color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .card-comment-count {
+    font-size: 0.72rem; color: var(--ink-muted);
+    margin-top: 8px; display: flex; align-items: center; gap: 4px;
+  }
+  .card-comment-count svg { opacity: 0.5; }
+
+  /* ── ADMIN BADGE ── */
+  .admin-bar {
+    background: var(--ink); color: white;
+    text-align: center; padding: 10px;
+    font-size: 0.8rem; letter-spacing: 0.05em;
+    display: none;
+  }
+  .admin-bar.visible { display: block; }
+
+  /* ── UPLOAD PANEL ── */
+  .upload-panel {
+    max-width: 600px; margin: 0 auto 40px;
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 28px;
+    display: none;
+  }
+  .upload-panel.visible { display: block; }
+  .upload-panel h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem; margin-bottom: 20px;
+    color: var(--ink);
+  }
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block; font-size: 0.78rem;
+    color: var(--ink-muted); margin-bottom: 6px;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .form-group input[type="text"],
+  .form-group textarea {
+    width: 100%; padding: 10px 14px;
+    border: 1px solid var(--border); border-radius: 8px;
+    background: var(--cream); color: var(--ink);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.88rem; font-weight: 300;
+    outline: none; resize: vertical;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group textarea:focus {
+    border-color: var(--accent);
+  }
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 10px; padding: 36px;
+    text-align: center; cursor: pointer;
+    transition: all 0.2s; position: relative;
+  }
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--accent); background: var(--accent-light);
+  }
+  .drop-zone input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+  }
+  .drop-zone p { font-size: 0.85rem; color: var(--ink-muted); }
+  .drop-zone .preview-img {
+    max-width: 100%; max-height: 200px;
+    border-radius: 6px; margin-top: 12px;
+  }
+
+  /* ── LIGHTBOX ── */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(26,22,18,0.92);
+    display: none; align-items: center; justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .lightbox.open { display: flex; }
+  .lb-inner {
+    background: var(--warm-white);
+    border-radius: 16px;
+    max-width: 900px; width: 100%;
+    max-height: 92vh; overflow-y: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    position: relative;
+  }
+  @media (max-width: 640px) {
+    .lb-inner { grid-template-columns: 1fr; }
+  }
+  .lb-img-wrap {
+    background: var(--cream);
+    border-radius: 16px 0 0 16px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; min-height: 320px;
+  }
+  @media (max-width: 640px) {
+    .lb-img-wrap { border-radius: 16px 16px 0 0; }
+  }
+  .lb-img-wrap img {
+    max-width: 100%; max-height: 500px;
+    object-fit: contain; border-radius: 8px;
+  }
+  .lb-side {
+    padding: 28px; display: flex; flex-direction: column;
+    border-left: 1px solid var(--border);
+  }
+  @media (max-width: 640px) {
+    .lb-side { border-left: none; border-top: 1px solid var(--border); }
+  }
+  .lb-date {
+    font-size: 0.72rem; color: var(--ink-muted);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px;
+  }
+  .lb-note {
+    font-size: 0.92rem; color: var(--ink-soft);
+    line-height: 1.65; margin-bottom: 20px;
+    font-family: 'Playfair Display', serif; font-style: italic;
+  }
+  .lb-close {
+    position: absolute; top: 14px; right: 16px;
+    background: none; border: none; cursor: pointer;
+    font-size: 1.4rem; color: var(--ink-muted);
+    line-height: 1; transition: color 0.2s;
+  }
+  .lb-close:hover { color: var(--ink); }
+
+  /* ── COMMENTS ── */
+  .comments-section { flex: 1; }
+  .comments-section h4 {
+    font-size: 0.78rem; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--ink-muted);
+    margin-bottom: 14px;
+  }
+  .comment-list { margin-bottom: 16px; }
+  .comment-item {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .comment-item:last-child { border-bottom: none; }
+  .comment-author {
+    font-size: 0.78rem; font-weight: 500; color: var(--ink);
+    margin-bottom: 3px;
+  }
+  .comment-body {
+    font-size: 0.83rem; color: var(--ink-soft); line-height: 1.5;
+  }
+  .comment-time {
+    font-size: 0.7rem; color: var(--ink-muted); margin-top: 2px;
+  }
+  .comment-form { margin-top: 8px; }
+  .comment-form input, .comment-form textarea {
+    width: 100%; padding: 8px 12px;
+    border: 1px solid var(--border); border-radius: 6px;
+    background: var(--cream); color: var(--ink);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.82rem; font-weight: 300;
+    outline: none; margin-bottom: 8px;
+    transition: border-color 0.2s;
+  }
+  .comment-form input:focus, .comment-form textarea:focus {
+    border-color: var(--accent);
+  }
+  .comment-form textarea { resize: none; height: 68px; }
+  .btn-sm {
+    padding: 7px 16px; font-size: 0.78rem;
+    border-radius: 6px; cursor: pointer; border: none;
+    background: var(--accent); color: white;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: background 0.2s;
+  }
+  .btn-sm:hover { background: #b5724a; }
+
+  /* ── LOGIN MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 2000;
+    background: rgba(26,22,18,0.7);
+    display: none; align-items: center; justify-content: center;
+    backdrop-filter: blur(3px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--warm-white);
+    border-radius: 16px; padding: 36px;
+    width: 320px; position: relative;
+  }
+  .modal h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem; margin-bottom: 6px;
+  }
+  .modal p { font-size: 0.8rem; color: var(--ink-muted); margin-bottom: 24px; }
+  .modal input {
+    width: 100%; padding: 10px 14px;
+    border: 1px solid var(--border); border-radius: 8px;
+    background: var(--cream); color: var(--ink);
+    font-size: 0.88rem; outline: none;
+    margin-bottom: 12px; font-family: 'Noto Sans KR', sans-serif;
+  }
+  .modal input:focus { border-color: var(--accent); }
+  .modal-close {
+    position: absolute; top: 14px; right: 16px;
+    background: none; border: none; cursor: pointer;
+    font-size: 1.3rem; color: var(--ink-muted);
+  }
+  .error-msg {
+    font-size: 0.78rem; color: #c0392b; margin-bottom: 10px; display: none;
+  }
+  .error-msg.visible { display: block; }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center; padding: 80px 20px;
+    color: var(--ink-muted);
+  }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 16px; opacity: 0.4; }
+  .empty-state p { font-size: 0.88rem; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--ink); color: white;
+    padding: 10px 22px; border-radius: 20px;
+    font-size: 0.82rem; z-index: 9999;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- Admin bar -->
+<div class="admin-bar" id="adminBar">✦ 관리자 모드 — 사진을 올릴 수 있습니다 &nbsp;<button class="btn btn-outline" style="padding:4px 12px;font-size:0.75rem;color:white;border-color:rgba(255,255,255,0.3)" onclick="logout()">로그아웃</button></div>
+
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <div class="logo">Sketch<span>book</span></div>
+    <div class="header-actions">
+      <button class="btn btn-outline" id="loginBtn" onclick="openLogin()">관리자 로그인</button>
+      <button class="btn btn-primary" id="uploadToggleBtn" onclick="toggleUpload()" style="display:none">+ 사진 올리기</button>
+    </div>
+  </div>
+</header>
+
+<!-- Hero -->
+<div class="hero">
+  <h1>손으로 그린 <em>이야기들</em></h1>
+  <p>직접 그린 그림들을 모아두는 작은 갤러리</p>
+</div>
+
+<!-- Gallery wrap -->
+<div class="gallery-wrap">
+
+  <!-- Upload panel -->
+  <div class="upload-panel" id="uploadPanel">
+    <h3>새 그림 올리기</h3>
+    <div class="form-group">
+      <label>사진 선택</label>
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" accept="image/*" onchange="onFileSelect(this)">
+        <p id="dropText">📎 클릭하거나 사진을 여기로 드래그하세요</p>
+        <img class="preview-img" id="previewImg" style="display:none">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>메모 (선택)</label>
+      <textarea id="noteInput" rows="3" placeholder="이 그림에 대한 간단한 메모를 남겨보세요..."></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="submitPhoto()" style="width:100%">올리기</button>
+  </div>
+
+  <!-- Gallery grid -->
+  <div class="gallery-grid" id="galleryGrid"></div>
+  <div class="empty-state" id="emptyState" style="display:none">
+    <div class="icon">✏️</div>
+    <p>아직 올린 그림이 없어요.<br>첫 번째 스케치를 올려보세요!</p>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightboxOnBg(event)">
+  <div class="lb-inner" id="lbInner">
+    <div class="lb-img-wrap">
+      <img id="lbImg" src="" alt="">
+    </div>
+    <div class="lb-side">
+      <button class="lb-close" onclick="closeLightbox()">✕</button>
+      <div class="lb-date" id="lbDate"></div>
+      <div class="lb-note" id="lbNote"></div>
+      <div class="comments-section">
+        <h4>댓글</h4>
+        <div class="comment-list" id="commentList"></div>
+        <div class="comment-form">
+          <input type="text" id="commentAuthor" placeholder="이름">
+          <textarea id="commentBody" placeholder="댓글을 남겨보세요..."></textarea>
+          <button class="btn-sm" onclick="submitComment()">등록</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Login Modal -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeLogin()">✕</button>
+    <h3>관리자 로그인</h3>
+    <p>비밀번호를 입력하세요</p>
+    <div class="error-msg" id="loginError">비밀번호가 틀렸어요.</div>
+    <input type="password" id="passwordInput" placeholder="비밀번호" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn btn-primary" style="width:100%" onclick="doLogin()">로그인</button>
+    <p style="margin-top:14px;font-size:0.74rem;color:var(--ink-muted)">기본 비밀번호: <code>sketch2024</code><br>코드 내 ADMIN_PASSWORD 변수에서 변경하세요.</p>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  CONFIG — 비밀번호를 여기서 변경하세요
+const ADMIN_PASSWORD = 'sketch2024';
+// ══════════════════════════════════════════════
+
+let isAdmin = false;
+let currentPhotoId = null;
+let selectedImageData = null;
+
+// ── Storage helpers ──
+function loadPhotos() {
+  try { return JSON.parse(localStorage.getItem('sketchbook_photos') || '[]'); } catch { return []; }
+}
+function savePhotos(photos) {
+  localStorage.setItem('sketchbook_photos', JSON.stringify(photos));
+}
+function loadComments(photoId) {
+  try { return JSON.parse(localStorage.getItem('sketchbook_comments_' + photoId) || '[]'); } catch { return []; }
+}
+function saveComments(photoId, comments) {
+  localStorage.setItem('sketchbook_comments_' + photoId, JSON.stringify(comments));
+}
+
+// ── Auth ──
+function openLogin() { document.getElementById('loginModal').classList.add('open'); setTimeout(()=>document.getElementById('passwordInput').focus(),100); }
+function closeLogin() { document.getElementById('loginModal').classList.remove('open'); document.getElementById('loginError').classList.remove('visible'); document.getElementById('passwordInput').value=''; }
+function doLogin() {
+  const pw = document.getElementById('passwordInput').value;
+  if (pw === ADMIN_PASSWORD) {
+    isAdmin = true;
+    closeLogin();
+    document.getElementById('adminBar').classList.add('visible');
+    document.getElementById('loginBtn').style.display = 'none';
+    document.getElementById('uploadToggleBtn').style.display = '';
+    showToast('관리자로 로그인됐어요 ✓');
+  } else {
+    document.getElementById('loginError').classList.add('visible');
+    document.getElementById('passwordInput').value='';
+    document.getElementById('passwordInput').focus();
+  }
+}
+function logout() {
+  isAdmin = false;
+  document.getElementById('adminBar').classList.remove('visible');
+  document.getElementById('loginBtn').style.display = '';
+  document.getElementById('uploadToggleBtn').style.display = 'none';
+  document.getElementById('uploadPanel').classList.remove('visible');
+  showToast('로그아웃됐어요');
+}
+
+// ── Upload ──
+function toggleUpload() {
+  const panel = document.getElementById('uploadPanel');
+  panel.classList.toggle('visible');
+}
+function onFileSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    selectedImageData = e.target.result;
+    const img = document.getElementById('previewImg');
+    img.src = selectedImageData;
+    img.style.display = 'block';
+    document.getElementById('dropText').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+function submitPhoto() {
+  if (!selectedImageData) { showToast('사진을 선택해주세요'); return; }
+  const note = document.getElementById('noteInput').value.trim();
+  const photos = loadPhotos();
+  const photo = {
+    id: Date.now().toString(),
+    src: selectedImageData,
+    note: note || '',
+    date: new Date().toLocaleDateString('ko-KR', {year:'numeric',month:'long',day:'numeric'})
+  };
+  photos.unshift(photo);
+  savePhotos(photos);
+  renderGallery();
+  // reset
+  selectedImageData = null;
+  document.getElementById('fileInput').value = '';
+  document.getElementById('previewImg').style.display = 'none';
+  document.getElementById('dropText').style.display = '';
+  document.getElementById('noteInput').value = '';
+  document.getElementById('uploadPanel').classList.remove('visible');
+  showToast('사진이 올라갔어요 ✓');
+}
+
+// Drag & drop
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (!file || !file.type.startsWith('image/')) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    selectedImageData = ev.target.result;
+    const img = document.getElementById('previewImg');
+    img.src = selectedImageData; img.style.display = 'block';
+    document.getElementById('dropText').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+});
+
+// ── Gallery ──
+function renderGallery() {
+  const photos = loadPhotos();
+  const grid = document.getElementById('galleryGrid');
+  const empty = document.getElementById('emptyState');
+  if (photos.length === 0) { grid.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = photos.map(p => {
+    const commentCount = loadComments(p.id).length;
+    return `<div class="card" onclick="openLightbox('${p.id}')">
+      <img src="${p.src}" alt="sketch" loading="lazy">
+      <div class="card-meta">
+        <div class="card-date">${p.date}</div>
+        ${p.note ? `<div class="card-note">${escHtml(p.note)}</div>` : ''}
+        ${commentCount > 0 ? `<div class="card-comment-count"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>${commentCount}개의 댓글</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Lightbox ──
+function openLightbox(id) {
+  currentPhotoId = id;
+  const photos = loadPhotos();
+  const photo = photos.find(p => p.id === id);
+  if (!photo) return;
+  document.getElementById('lbImg').src = photo.src;
+  document.getElementById('lbDate').textContent = photo.date;
+  document.getElementById('lbNote').textContent = photo.note || '';
+  renderComments();
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+  currentPhotoId = null;
+}
+function closeLightboxOnBg(e) {
+  if (e.target === document.getElementById('lightbox')) closeLightbox();
+}
+
+// ── Comments ──
+function renderComments() {
+  const comments = loadComments(currentPhotoId);
+  const list = document.getElementById('commentList');
+  if (comments.length === 0) { list.innerHTML = '<p style="font-size:0.8rem;color:var(--ink-muted);padding:8px 0">아직 댓글이 없어요. 첫 번째 댓글을 남겨보세요!</p>'; return; }
+  list.innerHTML = comments.map(c => `
+    <div class="comment-item">
+      <div class="comment-author">${escHtml(c.author)}</div>
+      <div class="comment-body">${escHtml(c.body)}</div>
+      <div class="comment-time">${c.time}</div>
+    </div>`).join('');
+}
+function submitComment() {
+  const author = document.getElementById('commentAuthor').value.trim();
+  const body = document.getElementById('commentBody').value.trim();
+  if (!author) { showToast('이름을 입력해주세요'); return; }
+  if (!body) { showToast('댓글 내용을 입력해주세요'); return; }
+  const comments = loadComments(currentPhotoId);
+  comments.push({
+    author, body,
+    time: new Date().toLocaleDateString('ko-KR', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})
+  });
+  saveComments(currentPhotoId, comments);
+  document.getElementById('commentAuthor').value = '';
+  document.getElementById('commentBody').value = '';
+  renderComments();
+  renderGallery(); // update count
+  showToast('댓글이 등록됐어요 ✓');
+}
+
+// ── Toast ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── Utils ──
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ESC to close lightbox
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+// Init
+renderGallery();
+</script>
+</body>
+</html>
