@@ -258,12 +258,42 @@ header {
   cursor: pointer;
 }
 .drop-zone p { font-size: 0.85rem; color: var(--ink-muted); }
-.preview-img {
-  max-width: 100%;
-  max-height: 200px;
-  border-radius: 6px;
+
+/* ── 다중 미리보기 그리드 ── */
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
   margin-top: 12px;
 }
+.preview-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.preview-remove {
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: rgba(26, 22, 18, 0.65);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 0.65rem;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+  transition: background 0.2s;
+}
+.preview-remove:hover { background: rgba(26, 22, 18, 0.9); }
 
 /* ── 빈 상태 ── */
 .empty-state {
