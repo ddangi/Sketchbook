@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# VS Code
+.vscode/settings.json
+
+# 환경설정 (비밀번호가 있을 경우 .env 파일 사용 시)
+.env
